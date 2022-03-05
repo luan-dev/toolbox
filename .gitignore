@@ -107,4 +107,5 @@ dist
 .tern-port
 
 # Python
+.mypy_cache
 .venv
