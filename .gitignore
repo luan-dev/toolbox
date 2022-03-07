@@ -1,3 +1,6 @@
+# OSX
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -102,3 +105,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Python
+.mypy_cache
+.venv
