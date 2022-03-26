@@ -7,7 +7,7 @@ from pptx.util import Inches
 from pdf2image import convert_from_path
 
 # decorator for timing
-def time_it(func: function):
+def time_it(func):
     def wrapper(*args, **kwargs):
         start_time: float = time.time()
         result = func(*args, **kwargs)
@@ -25,6 +25,8 @@ def convert():
 
     # create presentation
     ppt = Presentation()
+    ppt.slide_width = Inches(16)
+    ppt.slide_height = Inches(9)
     create_ppt(ppt, pages)
 
     # save presentation
