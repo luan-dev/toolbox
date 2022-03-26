@@ -1,6 +1,9 @@
 # OSX
 .DS_Store
 
+# IDE
+.vscode
+
 # Logs
 logs
 *.log
@@ -109,3 +112,7 @@ dist
 # Python
 .mypy_cache
 .venv
+
+# PDF to PPT Tests
+*.pdf
+*.pptx
