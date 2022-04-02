@@ -15,8 +15,11 @@ pip install -r requirements.txt
 Run script:
 
 ```
-python convert.py {input_file} {output_file}
-```
+python convert.py {input_file}
 
-> NOTE: `output_file` is optional.
-> Do not include the file extension in the `output_file` argument.
+optional arguments:
+  -o, --output
+    output file name (must include extension)
+  -l, --legacy_res
+    legacy resolution to support 4:3
+```
