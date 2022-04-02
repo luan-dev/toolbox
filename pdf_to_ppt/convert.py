@@ -1,7 +1,6 @@
-import os, sys, io, time
-import py_compile
+import os, io, time
+import argparse
 
-from PIL import Image
 from pptx import Presentation
 from pptx.util import Inches
 from pdf2image import convert_from_path
@@ -16,25 +15,22 @@ def time_it(func):
 
     return wrapper
 
-
 @time_it
-def convert():
+def convert(input_file: str, output_file: str, legacy_res: bool):
     # load file
-    input_file: str = sys.argv[1]
     pages: list = load_pdf(input_file)
 
     # create presentation
     ppt = Presentation()
-    ppt.slide_width = Inches(16)
-    ppt.slide_height = Inches(9)
+    if not legacy_res:
+        ppt.slide_width = Inches(16)
+        ppt.slide_height = Inches(9)
     create_ppt(ppt, pages)
 
     # save presentation
-    output_file: str = (
-        f"{input_file.split('.', 1)[0]}.pptx"
-        if len(sys.argv) < 3
-        else f"{sys.argv[2].split('.', 1)[0]}.pptx"
-    )
+    if not output_file:
+        # replace pdf with pptx
+        output_file = f"{input_file.split('.', 1)[0]}.pptx"
     ppt.save(output_file)
 
     # print file stats
@@ -73,4 +69,12 @@ def create_ppt(ppt: Presentation, pages: list):
 
 
 if __name__ == "__main__":
-    convert()
+    # parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_file", help="PDF file to convert")
+    parser.add_argument("-o", "--output", help="output file name (must include extension)", type=str)
+    parser.add_argument("-l", "--legacy_res", help="legacy resolution to support 4:3", type=bool)
+    args = parser.parse_args()
+
+    # pass arguments to main
+    convert(args.input_file, args.output, args.legacy_res)
