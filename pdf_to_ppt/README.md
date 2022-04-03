@@ -18,8 +18,6 @@ Run script:
 python convert.py {input_file}
 
 optional arguments:
-  -o, --output
-    output file name (must include extension)
-  -l, --legacy_res
-    legacy resolution to support 4:3
+  -o, --output FILENAME  output file name (must include extension)
+  -l, --legacy           legacy resolution to support 4:3 aspect ratio
 ```

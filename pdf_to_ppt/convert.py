@@ -1,5 +1,5 @@
 import os, io, time
-import argparse
+import click
 
 from pptx import Presentation
 from pptx.util import Inches
@@ -16,26 +16,30 @@ def time_it(func):
     return wrapper
 
 @time_it
-def convert(input_file: str, output_file: str, legacy_res: bool):
+@click.command()
+@click.argument('input_file')
+@click.option("-o", "--output", default=None, help="output file name (must include extension)", type=click.File('rb'))
+@click.option("-l", "--legacy", default=None, help="legacy resolution to support 4:3 aspect ratio", is_flag=True)
+def convert(input_file: str, output: str, legacy: bool):
     # load file
     pages: list = load_pdf(input_file)
 
     # create presentation
     ppt = Presentation()
-    if not legacy_res:
+    if not legacy:
         ppt.slide_width = Inches(16)
         ppt.slide_height = Inches(9)
     create_ppt(ppt, pages)
 
     # save presentation
-    if not output_file:
+    if not output:
         # replace pdf with pptx
-        output_file = f"{input_file.split('.', 1)[0]}.pptx"
-    ppt.save(output_file)
+        output = f"{input_file.split('.', 1)[0]}.pptx"
+    ppt.save(output)
 
     # print file stats
-    print(f"{len(pages)} pages converted to {output_file}")
-    size_in_mb: int = round(os.stat(output_file).st_size / (1024 * 1024), 2)
+    print(f"{len(pages)} pages converted to {output}")
+    size_in_mb: int = round(os.stat(output).st_size / (1024 * 1024), 2)
     print(f"File size: {size_in_mb} MB\n")
 
 
@@ -69,12 +73,4 @@ def create_ppt(ppt: Presentation, pages: list):
 
 
 if __name__ == "__main__":
-    # parse arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input_file", help="PDF file to convert")
-    parser.add_argument("-o", "--output", help="output file name (must include extension)", type=str)
-    parser.add_argument("-l", "--legacy_res", help="legacy resolution to support 4:3", type=bool)
-    args = parser.parse_args()
-
-    # pass arguments to main
-    convert(args.input_file, args.output, args.legacy_res)
+    convert()
