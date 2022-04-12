@@ -1,7 +1,6 @@
-import os, sys, io, time
-import py_compile
+import os, io, time
+import click
 
-from PIL import Image
 from pptx import Presentation
 from pptx.util import Inches
 from pdf2image import convert_from_path
@@ -16,30 +15,31 @@ def time_it(func):
 
     return wrapper
 
-
 @time_it
-def convert():
+@click.command()
+@click.argument('input_file')
+@click.option("-o", "--output", default=None, help="output file name (must include extension)", type=click.File('rb'))
+@click.option("-l", "--legacy", default=None, help="legacy resolution to support 4:3 aspect ratio", is_flag=True)
+def convert(input_file: str, output: str, legacy: bool):
     # load file
-    input_file: str = sys.argv[1]
     pages: list = load_pdf(input_file)
 
     # create presentation
     ppt = Presentation()
-    ppt.slide_width = Inches(16)
-    ppt.slide_height = Inches(9)
+    if not legacy:
+        ppt.slide_width = Inches(16)
+        ppt.slide_height = Inches(9)
     create_ppt(ppt, pages)
 
     # save presentation
-    output_file: str = (
-        f"{input_file.split('.', 1)[0]}.pptx"
-        if len(sys.argv) < 3
-        else f"{sys.argv[2].split('.', 1)[0]}.pptx"
-    )
-    ppt.save(output_file)
+    if not output:
+        # replace pdf with pptx
+        output = f"{input_file.split('.', 1)[0]}.pptx"
+    ppt.save(output)
 
     # print file stats
-    print(f"{len(pages)} pages converted to {output_file}")
-    size_in_mb: int = round(os.stat(output_file).st_size / (1024 * 1024), 2)
+    print(f"{len(pages)} pages converted to {output}")
+    size_in_mb: int = round(os.stat(output).st_size / (1024 * 1024), 2)
     print(f"File size: {size_in_mb} MB\n")
 
 
